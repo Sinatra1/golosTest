@@ -30,4 +30,5 @@ return [
         ],
     ],
     'params' => $params,
+    'language' => 'ru-RU', // <- here!
 ];
