@@ -225,6 +225,25 @@ CREATE TABLE  `physical_person_registration` (
   FOREIGN KEY (premise_id) REFERENCES premise(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='таблица отношений физ лица и помещения';
 
+
+drop table if exists `sms_transaction`; 
+CREATE TABLE  `sms_transactions` (
+  `id` int(11) NOT NULL COMMENT 'id sms транзакции',
+  `mc_id` int(11) NULL COMMENT 'id УО которая платит за смс сервис',
+  `physic_id` int(11) NOT NULL COMMENT 'id физического лица, который отправил рассылку',
+  `reg_date` datetime NOT NULL COMMENT 'дата создания',
+  `update_date` datetime NOT NULL COMMENT 'дата последнего изменения',
+  `del_date` datetime DEFAULT NULL COMMENT 'дата удаления',
+  `sum` decimal(10,2) NOT NULL COMMENT 'сумма смс рассылки',
+  `caption` varchar(255) NOT NULL COMMENT 'описание о рассылке',
+  `message` text NOT NULL COMMENT 'текст рассылки',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (mc_id) REFERENCES mc(id),
+  FOREIGN KEY (physic_id) REFERENCES physical_person(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='таблица смс рассылок (транзакций)';
+
+
+
 -- --------------------------------------------------------
 
 
