@@ -227,7 +227,7 @@ CREATE TABLE  `physical_person_registration` (
 
 
 drop table if exists `sms_transaction`; 
-CREATE TABLE  `sms_transactions` (
+CREATE TABLE  `sms_transaction` (
   `id` int(11) NOT NULL COMMENT 'id sms транзакции',
   `mc_id` int(11) NULL COMMENT 'id УО которая платит за смс сервис',
   `physic_id` int(11) NOT NULL COMMENT 'id физического лица, который отправил рассылку',
@@ -241,6 +241,44 @@ CREATE TABLE  `sms_transactions` (
   FOREIGN KEY (mc_id) REFERENCES mc(id),
   FOREIGN KEY (physic_id) REFERENCES physical_person(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='таблица смс рассылок (транзакций)';
+
+drop table if exists `sms_log`; 
+CREATE TABLE  `sms_log` (
+  `id` int(11) NOT NULL COMMENT 'id sms рассылки',
+  `physic_id` int(11) NULL COMMENT 'id физического лица, владельца данного сотового телефона',
+  `sms_transaction_id` int(11) NOT NULL COMMENT 'id смс транзакции',
+  `reg_date` datetime NOT NULL COMMENT 'дата создания',
+  `update_date` datetime NOT NULL COMMENT 'дата последнего изменения',
+  `del_date` datetime DEFAULT NULL COMMENT 'дата удаления',
+  `phone` varchar(13) NOT NULL COMMENT 'номер сотового телефона, на который отправлено смс',
+  `is_sent` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'отправлено сообщение или нет',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (sms_transaction_id) REFERENCES sms_transaction(id),
+  FOREIGN KEY (physic_id) REFERENCES physical_person(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='таблица отсылки одной смс на конкретный номер';
+
+drop table if exists `voting`; 
+CREATE TABLE  `voting` (
+  `id` int(11) NOT NULL COMMENT 'id госолования',
+  `mc_id` int(11) NOT NULL COMMENT 'id УО которая организовала голосование',
+  `physic_id` int(11) NOT NULL COMMENT 'id физического лица, создавшего голосование',
+  `start_date` datetime NOT NULL COMMENT 'планируемая дата начала заочного голосования',
+  `end_date` datetime NOT NULL COMMENT 'планируемая дата окончания заочного голосования',
+  `reg_date` datetime NOT NULL COMMENT 'дата создания',
+  `update_date` datetime NOT NULL COMMENT 'дата последнего изменения',
+  `del_date` datetime DEFAULT NULL COMMENT 'дата удаления',
+  `complete_date` datetime NULL DEFAULT NULL COMMENT 'дата завершения голосования',
+  `who_vote` enum('members', 'owners', 'members_and_owners') NOT NULL COMMENT 'кто могут голосовать: только члены ТСЖ, собственники или и те ,и другие',
+  `init_name` varchar(255) NOT NULL COMMENT 'ФИО инициатора голосования',
+  `is_hoa_member` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'тип инициатора голосования (члент ТСЖ или собственник)',
+  `init_location` varchar(255) NOT NULL COMMENT 'адрес проведения голосования или название ТСЖ',
+  `is_sent` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'отправлено сообщение или нет',
+  `caption` varchar(255) NOT NULL COMMENT 'заголовок голосования',
+  `description` text NOT NULL COMMENT 'повестка голосования',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (mc_id) REFERENCES mc(id),
+  FOREIGN KEY (physic_id) REFERENCES physical_person(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='таблица голосований';
 
 
 
