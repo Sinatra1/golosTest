@@ -25,8 +25,8 @@ SET time_zone = "+00:00";
 --
 -- Структура таблицы `address`
 --
-
-CREATE TABLE IF NOT EXISTS `address` (
+drop table if exists `address`;
+CREATE TABLE  `address` (
   `id` int(11) NOT NULL,
   `city` varchar(255) CHARACTER SET latin1 NOT NULL COMMENT 'название города',
   `street` varchar(255) CHARACTER SET latin1 NOT NULL COMMENT 'название улицы',
@@ -41,10 +41,26 @@ CREATE TABLE IF NOT EXISTS `address` (
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `mc`
+--
+drop table if exists `mc`;
+CREATE TABLE  `mc` (
+  `id` int(11) NOT NULL COMMENT 'id УО',
+  `type` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'тип УО (ТСЖ)',
+  `caption` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'краткое название УО',
+  `full_caption` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'полное название',
+  `reg_date` datetime NOT NULL COMMENT 'дата создания',
+  `update_date` datetime NOT NULL COMMENT 'дата последнего изменения',
+  `del_date` datetime DEFAULT NULL COMMENT 'дата удаления',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='таблица управляющих организаций (УО)';
+
+
+--
 -- Структура таблицы `building`
 --
-
-CREATE TABLE IF NOT EXISTS `building` (
+drop table if exists `building`;
+CREATE TABLE  `building` (
   `id` int(11) NOT NULL COMMENT 'id здания',
   `number` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'номер здания',
   `address_id` int(11) NOT NULL COMMENT 'id адреса, по которому находится данное здание',
@@ -53,6 +69,8 @@ CREATE TABLE IF NOT EXISTS `building` (
   `update_date` datetime NOT NULL COMMENT 'дата последнего изменения',
   `del_date` datetime DEFAULT NULL COMMENT 'дата удаления',
   PRIMARY KEY (`id`),
+  FOREIGN KEY (address_id) REFERENCES address(id),
+  FOREIGN KEY (mc_id) REFERENCES mc(id),
   UNIQUE KEY `address_number` (`address_id`,`number`),
   UNIQUE KEY `address_number_mc` (`address_id`,`number`,`mc_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='таблица зданий';
@@ -60,19 +78,47 @@ CREATE TABLE IF NOT EXISTS `building` (
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `physical_person`
+--
+drop table if exists `physical_person`;
+CREATE TABLE  `physical_person` (
+  `id` int(11) NOT NULL,
+  `name` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'имя физ лица',
+  `surname` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'фамилия физ лица',
+  `patronymic` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'отчество физ лица',
+  `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'эл. почта физ лица',
+  `phone` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'тел. физ лица',
+  `password` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'пароль физ лица',
+  `reg_date` datetime NOT NULL COMMENT 'дата регистрации',
+  `update_date` datetime NOT NULL COMMENT 'дата последних изменений',
+  `del_date` datetime DEFAULT NULL COMMENT 'дата удаления профайла',
+  `avatar_id` int(11) DEFAULT NULL COMMENT 'id файла с аватаром',
+  `submit_date` datetime DEFAULT NULL COMMENT 'дата подтверждения регистрации физ лицом',
+  `inform_by_sms` tinyint(1) NOT NULL DEFAULT '1',
+  `inform_by_email` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `phone` (`phone`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='физические лица';
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `employee`
 --
-
-CREATE TABLE IF NOT EXISTS `employee` (
+drop table if exists `employee`;
+CREATE TABLE  `employee` (
   `id` int(11) NOT NULL COMMENT 'id сотрудника УО',
   `physic_id` int(11) NOT NULL COMMENT 'id физ лица',
+  `mc_id` int(11) NOT NULL COMMENT 'id УО, к которой пренадлежит данный сотрудник',
   `position` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'должность сотрудника УО',
   `reg_date` datetime NOT NULL COMMENT 'дата создания',
   `update_date` datetime NOT NULL COMMENT 'дата последних изменений',
   `approve_date` datetime DEFAULT NULL COMMENT 'дата подтверждения заявки на вступление в сотрудники',
   `del_date` datetime DEFAULT NULL COMMENT 'дата удаления',
-  `mc_id` int(11) NOT NULL COMMENT 'id УО, к которой пренадлежит данный сотрудник',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (mc_id) REFERENCES mc(id),
+  FOREIGN KEY (physic_id) REFERENCES physical_person(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='таблица сотрудников УО';
 
 -- --------------------------------------------------------
@@ -80,8 +126,8 @@ CREATE TABLE IF NOT EXISTS `employee` (
 --
 -- Структура таблицы `legal_person`
 --
-
-CREATE TABLE IF NOT EXISTS `legal_person` (
+drop table if exists `legal_person`;
+CREATE TABLE  `legal_person` (
   `id` int(11) NOT NULL,
   `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'название юр. лица',
   `inn` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'инн организации',
@@ -115,92 +161,10 @@ CREATE TABLE IF NOT EXISTS `legal_person` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `legal_person_registration`
---
-
-CREATE TABLE IF NOT EXISTS `legal_person_registration` (
-  `legal_id` int(11) NOT NULL COMMENT 'id юр. лица',
-  `premise_id` int(11) NOT NULL COMMENT 'id помещения',
-  `reg_date` datetime NOT NULL COMMENT 'дата создания',
-  `update_date` datetime NOT NULL COMMENT 'дата последних изменений',
-  `approve_date` datetime DEFAULT NULL COMMENT 'дата получения подтвержденного профиля',
-  `resolve_date` datetime DEFAULT NULL COMMENT 'дата обработки заявки сотрудником УО',
-  `is_owner` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'собственник ли',
-  `share` decimal(10,0) DEFAULT NULL COMMENT 'процент собственности',
-  `del_date` datetime DEFAULT NULL COMMENT 'дата удаления',
-  PRIMARY KEY (`legal_id`,`premise_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='таблица отношений юр. лица и помещения';
-
--- --------------------------------------------------------
-
---
--- Структура таблицы `mc`
---
-
-CREATE TABLE IF NOT EXISTS `mc` (
-  `id` int(11) NOT NULL COMMENT 'id УО',
-  `type` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'тип УО (ТСЖ)',
-  `caption` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'краткое название УО',
-  `full_caption` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'полное название',
-  `reg_date` datetime NOT NULL COMMENT 'дата создания',
-  `update_date` datetime NOT NULL COMMENT 'дата последнего изменения',
-  `del_date` datetime DEFAULT NULL COMMENT 'дата удаления',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='таблица управляющих организаций (УО)';
-
--- --------------------------------------------------------
-
---
--- Структура таблицы `physical_person`
---
-
-CREATE TABLE IF NOT EXISTS `physical_person` (
-  `id` int(11) NOT NULL,
-  `name` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'имя физ лица',
-  `surname` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'фамилия физ лица',
-  `patronymic` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'отчество физ лица',
-  `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'эл. почта физ лица',
-  `phone` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'тел. физ лица',
-  `password` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'пароль физ лица',
-  `reg_date` datetime NOT NULL COMMENT 'дата регистрации',
-  `update_date` datetime NOT NULL COMMENT 'дата последних изменений',
-  `del_date` datetime DEFAULT NULL COMMENT 'дата удаления профайла',
-  `avatar_id` int(11) DEFAULT NULL COMMENT 'id файла с аватаром',
-  `submit_date` datetime DEFAULT NULL COMMENT 'дата подтверждения регистрации физ лицом',
-  `inform_by_sms` tinyint(1) NOT NULL DEFAULT '1',
-  `inform_by_email` tinyint(1) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `phone` (`phone`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='физические лица';
-
--- --------------------------------------------------------
-
---
--- Структура таблицы `physical_person_registration`
---
-
-CREATE TABLE IF NOT EXISTS `physical_person_registration` (
-  `physic_id` int(11) NOT NULL COMMENT 'id физического лица',
-  `premise_id` int(11) NOT NULL COMMENT 'id помещения',
-  `reg_date` datetime NOT NULL COMMENT 'дата создания',
-  `update_date` datetime NOT NULL COMMENT 'дата последнего изменения',
-  `approve_date` datetime DEFAULT NULL COMMENT 'дата получения подтвержденного профиля',
-  `resolve_date` datetime DEFAULT NULL COMMENT 'дата обработки заявки сотрудником УО',
-  `is_hoa_member` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'член ли ТСЖ',
-  `is_owner` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'собственник ли',
-  `share` decimal(10,0) DEFAULT NULL COMMENT 'процент собственности',
-  `del_date` datetime DEFAULT NULL COMMENT 'дата удаления',
-  PRIMARY KEY (`physic_id`,`premise_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='таблица отношений физ лица и помещения';
-
--- --------------------------------------------------------
-
---
 -- Структура таблицы `premise`
 --
-
-CREATE TABLE IF NOT EXISTS `premise` (
+drop table if exists `premise`;
+CREATE TABLE  `premise` (
   `id` int(11) NOT NULL COMMENT 'id помещения',
   `number` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'номер помещения',
   `account` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'номер лицевого счета',
@@ -219,6 +183,51 @@ CREATE TABLE IF NOT EXISTS `premise` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='таблица помещений';
 
 -- --------------------------------------------------------
+
+--
+-- Структура таблицы `legal_person_registration`
+--
+drop table if exists `legal_person_registration`; 
+CREATE TABLE  `legal_person_registration` (
+  `legal_id` int(11) NOT NULL COMMENT 'id юр. лица',
+  `premise_id` int(11) NOT NULL COMMENT 'id помещения',
+  `reg_date` datetime NOT NULL COMMENT 'дата создания',
+  `update_date` datetime NOT NULL COMMENT 'дата последних изменений',
+  `approve_date` datetime DEFAULT NULL COMMENT 'дата получения подтвержденного профиля',
+  `resolve_date` datetime DEFAULT NULL COMMENT 'дата обработки заявки сотрудником УО',
+  `is_owner` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'собственник ли',
+  `share` decimal(10,0) DEFAULT NULL COMMENT 'процент собственности',
+  `del_date` datetime DEFAULT NULL COMMENT 'дата удаления',
+  PRIMARY KEY (`legal_id`,`premise_id`),
+  FOREIGN KEY (premise_id) REFERENCES premise(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='таблица отношений юр. лица и помещения';
+
+-- --------------------------------------------------------
+
+
+
+--
+-- Структура таблицы `physical_person_registration`
+--
+drop table if exists `physical_person_registration`; 
+CREATE TABLE  `physical_person_registration` (
+  `physic_id` int(11) NOT NULL COMMENT 'id физического лица',
+  `premise_id` int(11) NOT NULL COMMENT 'id помещения',
+  `reg_date` datetime NOT NULL COMMENT 'дата создания',
+  `update_date` datetime NOT NULL COMMENT 'дата последнего изменения',
+  `approve_date` datetime DEFAULT NULL COMMENT 'дата получения подтвержденного профиля',
+  `resolve_date` datetime DEFAULT NULL COMMENT 'дата обработки заявки сотрудником УО',
+  `is_hoa_member` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'член ли ТСЖ',
+  `is_owner` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'собственник ли',
+  `share` decimal(10,0) DEFAULT NULL COMMENT 'процент собственности',
+  `del_date` datetime DEFAULT NULL COMMENT 'дата удаления',
+  PRIMARY KEY (`physic_id`,`premise_id`),
+  FOREIGN KEY (premise_id) REFERENCES premise(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='таблица отношений физ лица и помещения';
+
+-- --------------------------------------------------------
+
+
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
