@@ -115,15 +115,15 @@ CREATE TABLE IF NOT EXISTS `legal_person` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `legal_premise`
+-- Структура таблицы `legal_person_registration`
 --
 
-CREATE TABLE IF NOT EXISTS `legal_premise` (
+CREATE TABLE IF NOT EXISTS `legal_person_registration` (
   `legal_id` int(11) NOT NULL COMMENT 'id юр. лица',
   `premise_id` int(11) NOT NULL COMMENT 'id помещения',
   `reg_date` datetime NOT NULL COMMENT 'дата создания',
   `update_date` datetime NOT NULL COMMENT 'дата последних изменений',
-  `aprove_date` datetime DEFAULT NULL COMMENT 'дата получения подтвержденного профиля',
+  `approve_date` datetime DEFAULT NULL COMMENT 'дата получения подтвержденного профиля',
   `resolve_date` datetime DEFAULT NULL COMMENT 'дата обработки заявки сотрудником УО',
   `is_owner` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'собственник ли',
   `share` decimal(10,0) DEFAULT NULL COMMENT 'процент собственности',
@@ -219,33 +219,6 @@ CREATE TABLE IF NOT EXISTS `premise` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='таблица помещений';
 
 -- --------------------------------------------------------
-
---
--- Структура таблицы `user`
---
-
-CREATE TABLE IF NOT EXISTS `user` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(100) NOT NULL,
-  `password_hash` varchar(100) NOT NULL,
-  `status` int(11) DEFAULT NULL,
-  `auth_key` text,
-  `email` varchar(255) NOT NULL COMMENT 'эл. почта пользователя',
-  `role` varchar(255) NOT NULL COMMENT 'роль пользователя',
-  `created_at` datetime NOT NULL COMMENT 'дата регистрации',
-  `updated_at` datetime NOT NULL COMMENT 'дата обновления информации о пользователе',
-  `password_reset_token` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
-
---
--- Дамп данных таблицы `user`
---
-
-INSERT INTO `user` (`id`, `username`, `password_hash`, `status`, `auth_key`, `email`, `role`, `created_at`, `updated_at`, `password_reset_token`) VALUES
-(1, '1', '$2y$13$cDuwrr7T0rugn2diGHWu6.0GnGvtcsuDNb16ECXeKea3ohDkndOp2', 10, NULL, '', '', '0000-00-00 00:00:00', '0000-00-00 00:00:00', NULL),
-(2, '22', '$2y$13$Q6kDzq4lc.RqCOE0a8VVneABZ/HfyYuMKOAz6ZlPWO4QY81FL7moO', 10, 'IBJ6PghkTVDdRBvJR0YtAH93P7pF2ZdA', 'vlad_shumilov@mail.ru', '10', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'jnI1mN3-Yl2C6Ye7X25HIWGY6ZCMG4_p_1413114986'),
-(3, '333', '$2y$13$3MMgiOn4L3c7iXE5rD7loOUIrm3d/blgkLX5QxclEBuWh4v49DJW2', 10, 'Gll5nspAevl1jXHJFOQiybdsH_8Gdo6F', '333@mail.ru', '10', '0000-00-00 00:00:00', '0000-00-00 00:00:00', NULL);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

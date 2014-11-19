@@ -115,15 +115,15 @@ CREATE TABLE IF NOT EXISTS `legal_person` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `legal_premise`
+-- Структура таблицы `legal_person_registration`
 --
 
-CREATE TABLE IF NOT EXISTS `legal_premise` (
+CREATE TABLE IF NOT EXISTS `legal_person_registration` (
   `legal_id` int(11) NOT NULL COMMENT 'id юр. лица',
   `premise_id` int(11) NOT NULL COMMENT 'id помещения',
   `reg_date` datetime NOT NULL COMMENT 'дата создания',
   `update_date` datetime NOT NULL COMMENT 'дата последних изменений',
-  `aprove_date` datetime DEFAULT NULL COMMENT 'дата получения подтвержденного профиля',
+  `approve_date` datetime DEFAULT NULL COMMENT 'дата получения подтвержденного профиля',
   `resolve_date` datetime DEFAULT NULL COMMENT 'дата обработки заявки сотрудником УО',
   `is_owner` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'собственник ли',
   `share` decimal(10,0) DEFAULT NULL COMMENT 'процент собственности',
@@ -177,10 +177,10 @@ CREATE TABLE IF NOT EXISTS `physical_person` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `physic_premise`
+-- Структура таблицы `physical_person_registration`
 --
 
-CREATE TABLE IF NOT EXISTS `physic_premise` (
+CREATE TABLE IF NOT EXISTS `physical_person_registration` (
   `physic_id` int(11) NOT NULL COMMENT 'id физического лица',
   `premise_id` int(11) NOT NULL COMMENT 'id помещения',
   `reg_date` datetime NOT NULL COMMENT 'дата создания',
